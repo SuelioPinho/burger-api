@@ -4,7 +4,7 @@ check_content() {
 	FOUND=0
 	for FILE in *
 	do
-		if [ "$FILE" = "lambda_function.py" ] || [ "$FILE" = "index.js" ]
+		if [ ${FILE: -3} == ".py" ] || [ "$FILE" = "index.js" ]
 		then
 	  		FOUND=1
 	  		break
@@ -24,7 +24,7 @@ make_zip() {
 }
 
 scan_directory() {
-	if [ -d "$1" ] 
+	if [ -d "$1" ]
 	then
 		eval "cd $1"
 		DIR="${PWD##*/}"
@@ -39,7 +39,7 @@ scan_directory() {
 			done
 		fi
 		cd ..
-	fi	
+	fi
 }
 
 BASEDIR=$(dirname "$0")

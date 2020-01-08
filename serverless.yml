@@ -26,6 +26,11 @@ provider:
   region: us-east-1
   runtime: python3.7
 
+layers:
+  CallFunction:
+    package:
+      artifact: functions/CallFunction/CallFunction.zip
+
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
 #    - Effect: "Allow"
@@ -56,6 +61,20 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
+  GenericDao:
+    handler: lambda_function.lambda_handler
+    timeout: 30
+    rumtime: python3.7
+    memorySize: 128
+    environment:
+      DATA_TABLE: !Ref DataTable
+    role:
+      Fn::GetAtt:
+        - LambdaTestEntitesDBInvokeRole
+        - Arn
+    package:
+      artifact: functions/GenericDao/GenericDao.zip
+
   ListIngredients:
     handler: lambda_function.lambda_handler
     timeout: 30
@@ -75,8 +94,14 @@ functions:
     timeout: 30
     rumtime: python3.7
     memorySize: 128
+    role:
+      Fn::GetAtt:
+        - LambdaTestEntitesDBInvokeRole
+        - Arn
     package:
       artifact: functions/Order/CreateOrder/CreateOrder.zip
+    layers:
+      - {Ref: CallFunctionLambdaLayer}
     events:
       - http:
           path: "/orders"
@@ -132,6 +157,32 @@ package:
 # you can add CloudFormation resource templates here
 resources:
  Resources:
+   LambdaTestEntitesDBInvokeRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action:
+                - "sts:AssumeRole"
+        Policies:
+          - PolicyName: "LambdaDynamoDBPolicy"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - "cloudwatch:*"
+                    - "logs:*"
+                    - "events:*"
+                    - "lambda:*"
+                    - "dynamodb:*"
+                  Resource: "*"
+
    DataTable:
      Type: AWS::DynamoDB::Table
      Properties:
