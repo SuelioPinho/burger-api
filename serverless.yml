@@ -56,6 +56,39 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
+  ListIngredients:
+    handler: lambda_function.lambda_handler
+    timeout: 30
+    rumtime: python3.7
+    memorySize: 128
+    package:
+      artifact: functions/Ingredient/ListIngredients/ListIngredients.zip
+    events:
+      - http:
+          path: "/ingredients"
+          method: get
+          cors: true
+          integration: lambda
+
+  CreateOrder:
+    handler: lambda_function.lambda_handler
+    timeout: 30
+    rumtime: python3.7
+    memorySize: 128
+    package:
+      artifact: functions/Order/CreateOrder/CreateOrder.zip
+    events:
+      - http:
+          path: "/orders"
+          method: post
+          cors: true
+          integration: lambda
+          request:
+            template:
+              application/json: '{"body": $input.json(''$'')}'
+
+package:
+  individually: true
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -97,8 +130,35 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
-#resources:
-#  Resources:
+resources:
+ Resources:
+   DataTable:
+     Type: AWS::DynamoDB::Table
+     Properties:
+       AttributeDefinitions:
+       - AttributeName: id
+         AttributeType: S
+       - AttributeName: sort_key
+         AttributeType: S
+       KeySchema:
+       - AttributeName: id
+         KeyType: HASH
+       TableName: burger_table
+       ProvisionedThroughput:
+         ReadCapacityUnits:  '1'
+         WriteCapacityUnits:  '1'
+       GlobalSecondaryIndexes:
+       - IndexName: EntityIndex
+         KeySchema:
+         - AttributeName: sort_key
+           KeyType: HASH
+         - AttributeName: id
+           KeyType: RANGE
+         Projection:
+           ProjectionType: ALL
+         ProvisionedThroughput:
+           ReadCapacityUnits: '1'
+           WriteCapacityUnits: '1'
 #    NewResource:
 #      Type: AWS::S3::Bucket
 #      Properties:
