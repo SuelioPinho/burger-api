@@ -1,6 +1,9 @@
 version: 0.2
 
 phases:
+  install:
+    commands:
+      - curl -o- -L https://slss.io/install | bash
   build:
     commands:
       - serverless deploy
