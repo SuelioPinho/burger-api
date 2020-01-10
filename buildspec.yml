@@ -8,7 +8,7 @@ phases:
   build:
     commands:
       - serverless deploy
-  artifacts:
-    files:
-      - '**/*'
-    base-directory: .serverless
+artifacts:
+  files:
+    - '**/*'
+  base-directory: .serverless
