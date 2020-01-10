@@ -130,6 +130,31 @@ functions:
             template:
               application/json: '{"body": $input.json(''$'')}'
 
+  DeleteOrder:
+    handler: lambda_function.lambda_handler
+    timeout: 30
+    rumtime: python3.7
+    memorySize: 128
+    role:
+      Fn::GetAtt:
+        - LambdaTestEntitesDBInvokeRole
+        - Arn
+    package:
+      artifact: functions/Order/DeleteOrder/DeleteOrder.zip
+    layers:
+      - {Ref: CallFunctionLambdaLayer}
+    events:
+      - http:
+          path: "/orders/{order_id}"
+          method: delete
+          cors: true
+          integration: lambda
+          request:
+            paths:
+              order_id: true
+            template:
+              application/json: '{"order_id": $input.params(''order_id'')}'
+
 
 package:
   individually: true
