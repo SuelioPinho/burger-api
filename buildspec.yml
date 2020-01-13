@@ -1,10 +1,10 @@
 version: 0.2
 
-
 phases:	phases:
   install:
     commands:
       - npm install -g serverless
+      - pip install boto3
   build:
     commands:
       - serverless deploy
