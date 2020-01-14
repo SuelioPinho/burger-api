@@ -28,6 +28,8 @@ provider:
 
 layers:
   CallFunction:
+    compatibleRuntimes:
+      - python3.7
     package:
       artifact: functions/CallFunction/CallFunction.zip
 
@@ -98,6 +100,8 @@ functions:
       Fn::GetAtt:
         - LambdaTestEntitesDBInvokeRole
         - Arn
+    layers:
+      - {Ref: CallFunctionLambdaLayer}
     package:
       artifact: functions/Order/ListOrders/ListOrders.zip
     events:
@@ -153,7 +157,7 @@ functions:
             paths:
               order_id: true
             template:
-              application/json: '{"order_id": $input.params(''order_id'')}'
+              application/json: '{"order_id": "$input.params(''order_id'')"}'
 
 
 package:
